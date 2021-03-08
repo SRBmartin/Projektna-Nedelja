@@ -1,0 +1,53 @@
+@import "reset.css";
+@import "fonts.css";
+
+body{
+    background-color: #B7BFCC;
+}
+
+.header{
+    width: 90%;
+    margin:auto;
+}
+
+.header-carousel{
+    height: 250px;
+}
+
+.header-carousel-img{
+    height: 250px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.navbar-L-text{ /*Poseban font za Školska biblioteka*/
+    font-family: "Andric";
+    font-size: 30px;
+}
+
+.navbar-dark .navbar-brand{
+    color: #adb5bd;
+}
+
+.navbar-brand-img{
+    width:32px;
+    height: 32px;
+}
+
+.navbar-brand{
+    padding-top: .05rem;
+    padding-bottom: .8rem;
+}
+
+.navbar{
+    padding:0;
+    padding-left: .5rem;
+}
+
+#Knjizevnost-Navbar-Dropdown:hover{
+    cursor: pointer;
+}
+
+#NavBarDropDownKorisnik:hover{
+    cursor: pointer;
+}
