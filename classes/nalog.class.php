@@ -3,19 +3,22 @@
     {
         /**************************** LOGIN FUNKCIJE *************************/
         public static function emptyLogin($email,$password){
+            $eEmail = false;
+            $ePassword = false;
             if(empty($email)){
-                if(!isset($_SESSION["login-error"])){
-                    $_SESSION["login-error"] = array();
-                }
-                $_SESSION["login-error"]["email"] = "Нисте унели мејл."; 
+                $eEmail = true;
             }
             if(empty($password)){
-                if(!isset($_SESSION["login-error"])){
-                    $_SESSION["login-error"] = array();
-                }
-                $_SESSION["login-error"]["password"] = "Нисте унели шифру."; 
+                $ePassword = true; 
             }
-            if(isset($_SESSION["login-error"])){
+            if($eEmail and $ePassword){
+                $_SESSION["login-greska"] = 707; // oba fale
+                return true;
+            } else if($eEmail){
+                $_SESSION["login-greska"] = 705; //email fali
+                return true;
+            } else if($ePassword){
+                $_SESSION["login-greska"] = 706; //sifra fali
                 return true;
             } else{
                 return false;
@@ -26,7 +29,8 @@
             $sql = "SELECT korisnicko_ime FROM korisnici WHERE email=?;";
             $stmt = $con->stmt_init();
             if(!$stmt->prepare($sql)){
-
+                header('HTTP/1.0 400 Bad error'); //stmt greska
+                exit();
             } else{
                 $stmt->bind_param("s",$email);
                 $stmt->execute();
@@ -44,7 +48,8 @@
             $sql = "SELECT id FROM korisnici WHERE email=?;";
             $stmt = $con->stmt_init();
             if(!$stmt->prepare($sql)){
-                //doslo je do greske
+                header('HTTP/1.0 400 Bad error'); //stmt greska
+                exit();
             } else{
                 $stmt->bind_param("s",$email);
                 $stmt->execute();
@@ -63,7 +68,8 @@
             $sql = "SELECT verifikovan FROM korisnici WHERE id=?;";
             $stmt = $con->stmt_init();
             if(!$stmt->prepare($sql)){
-                //doslo je do greske
+                header('HTTP/1.0 400 Bad error'); //stmt greska
+                exit();
             } else{
                 $stmt->bind_param("i",$id);
                 $stmt->execute();
@@ -85,13 +91,14 @@
 
         public static function loginUser($email, $password){
             $con = Dbh::connect();
-            $exists;
+            $exists = true;
             if(self::userExists($con,$email)){
                 if($id = self::getUserId($con, $email) !== -1){
                     $sql = "SELECT sifra,salt FROM korisnici WHERE id=?;";
                     $stmt = $con->stmt_init();
                     if(!$stmt->prepare($sql)){
-                        //doslo je do greske
+                        header('HTTP/1.0 400 Bad error'); //stmt greska
+                        exit();
                     }else{
                         $stmt->bind_param("i",$id);
                         $stmt->execute();
@@ -106,7 +113,8 @@
                                     $sql = "SELECT korisnicko_ime,ssid FROM korisnici WHERE id=?;";
                                     $stmt = $con->stmt_init();
                                     if(!$stmt->prepare($sql)){
-                                        //doslo je do greske
+                                        header('HTTP/1.0 400 Bad error'); //stmt greska
+                                        exit();
                                     } else{
                                         $stmt->bind_param("i",$id);
                                         $stmt->execute();
@@ -122,17 +130,17 @@
                                         $_SESSION["korisnik"]["id"] = $id;
                                         $_SESSION["korisnik"]["ussid"] = $inf["ssid"];
                                         $_SESSION["cookie_check"] = "ovojetajnaporuka2708инаћирилициисто";
-                                        return $_SESSION["korisnik"]["korisnicko_ime"].' '.$_SESSION["korisnik"]["email"].' '.$_SESSION["korisnik"]["id"];
-                                        //return "<p>ulogovan je</p>";
                                     }
                                 } else{
-                                    //ispisati poruku da nije verifikovan
+                                    header('HTTP/1.0 703 Not verified'); //nije verifikovan
+                                    exit();
                                 }
                             } else{
                                 $exists = false;
                             }
                         } else{
-                            //nije dobra sifra
+                            header('HTTP/1.0 701 Wrong pass'); //pogresna sifra
+                            exit();
                         }
                     }
                     
@@ -143,16 +151,16 @@
                 $exists = false;
             }
             if(!$exists){
-
+                header('HTTP/1.0 704 Acc doesnt exist'); //nalog ne postoji
+                exit();
             } else{
-                
-                
+                return true;
             }
         }
 
         public static function set_login_cookie(){
             if(isset($_SESSION["cookie_check"]) and $_SESSION["cookie_check"] === "ovojetajnaporuka2708инаћирилициисто" and isset($_SESSION["korisnik"]["ussid"])){
-                setcookie("ussid",$_SESSION["korisnik"]["ussid"]);
+                setcookie("ussid",$_SESSION["korisnik"]["ussid"],time()+30,"/");
                 unset($_SESSION["cookie_check"]);
             }
         }
