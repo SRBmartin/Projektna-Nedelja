@@ -131,13 +131,13 @@
                         }
                         if(!isset($_SESSION["korisnik"])){
                             if(isset($_SESSION["page_index_navbar_active"]) and ($_SESSION["page_index_navbar_active"] === 6 or $_SESSION["page_index_navbar_active"] === 7)){
-                                echo '<li class="nav-item dropdown active">';
+                                echo '<li class="nav-item dropdown active" id="Login-Li">';
                             } else{
-                                echo '<li class="nav-item dropdown">';
+                                echo '<li class="nav-item dropdown" id="Login-Li">';
                             }
                             echo '<a class="nav-link dropdown-toggle" id="NavBarDropDownKorisnik" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Пријави се</a>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="NavBarDropDownKorisnik">
-                                <form class="px-4 py-3">
+                                <form class="px-4 py-3" id="login-form">
                                     <div class="form-group">
                                         <label for="LoginEmailNavBar">Мејл адреса</label>
                                         <input type="email" class="form-control" id="LoginEmailNavBar" placeholder="email@example.com">
@@ -150,24 +150,41 @@
                                         <input type="checkbox" class="form-check-input" id="LoginRememberMeCheck" value="RememberMe">
                                         <label class="form-check-label" for="LoginRememberMeCheck">Запамти ме</label>
                                     </div>
+                                    <div class="g-recaptcha" data-sitekey="6LfpjHgaAAAAAOMR8ghLBFYjRQYn9iNJIdNlavnP"></div>
+                                    <div class="invalid-feedback" id="capt-err" style="display:none;">Нисте означили заштитни слој reCaptcha.</div>
+                                    <div class="invalid-feedback" id="login-err" style="display:none;">Дошло је до грешке. Покушајте касније.</div>
+                                    <div class="invalid-feedback" id="ver-err" style="display:none;">Ваш налог није верификован Проверите свој мејл и потражите линк за верификацију, ако желите можете опет да пошаљете мејл притисните <a href="https://skolskabiblioteka.muharemovic.com/p/mailver">овде</a>.</div>
                                     <button type="button" id="login-submit" class="btn btn-primary">Пријави се</button>
                                 </form>
                                 <div class="dropdown-divider"></div>';
                                 if(isset($_SESSION["page_index_navbar_active"]) and $_SESSION["page_index_navbar_active"] === 6){
-                                    echo '<a class="dropdown-item active" href="https://skolskabiblioteka.muharemovic.com/p/signup">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Направите налог</a>';
+                                    echo '<a class="dropdown-item active" id="napravi-nalog-link" href="https://skolskabiblioteka.muharemovic.com/p/signup">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Направите налог</a>';
                                 } else{
-                                    echo '<a class="dropdown-item" href="https://skolskabiblioteka.muharemovic.com/p/signup">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Направите налог</a>';
+                                    echo '<a class="dropdown-item" id="napravi-nalog-link" href="https://skolskabiblioteka.muharemovic.com/p/signup">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Направите налог</a>';
                                 }
                                 if(isset($_SESSION["page_index_navbar_active"]) and $_SESSION["page_index_navbar_active"] === 7){
-                                    echo '<a class="dropdown-item active" href="https://skolskabiblioteka.muharemovic.com/p/fpass">&nbsp;&nbsp;Заборављена шифра&nbsp;&nbsp;</a>';
+                                    echo '<a class="dropdown-item active" id="zaboravljena-sifra-link" href="https://skolskabiblioteka.muharemovic.com/p/fpass">&nbsp;&nbsp;Заборављена шифра&nbsp;&nbsp;</a>';
                                 } else{
-                                    echo '<a class="dropdown-item" href="https://skolskabiblioteka.muharemovic.com/p/fpass">&nbsp;&nbsp;Заборављена шифра&nbsp;&nbsp;</a>';
+                                    echo '<a class="dropdown-item" id="zaboravljena-sifra-link" href="https://skolskabiblioteka.muharemovic.com/p/fpass">&nbsp;&nbsp;Заборављена шифра&nbsp;&nbsp;</a>';
                                 }
                                 echo '</div>
                                       </li>';
                         } else{
-
-                        }
+                            if(isset($_SESSION["korisnik"]["admin"]) and $_SESSION["korisnik"]["admin"] > 0){
+                                echo '<li class="nav-item">
+                                    <a class="nav-link" href="https://skolskabiblioteka.muharemovic.com/p/urpan">Уреднички панел</a>
+                                    </li>';
+                            }
+                            echo '<li class="nav-item dropdown" id="User-CP-Navbar">
+                                    <a class="nav-link dropdown-toggle" id="NavBarDropDownKorisnik" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'. $_SESSION["korisnik"]["korisnicko_ime"] .'</a>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="NavBarDropDownKorisnik">
+                                    <a class="dropdown-item" href="#">Профил</a>
+                                    <a class="dropdown-item" href="#">Моје књиге</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="https://skolskabiblioteka.muharemovic.com/p/logout">Одјави се</a>
+                                    </div>
+                                </li>';
+                        } //NE ZABORAVI DA DODAS INDEXE
                 echo '</ul>
                  </div>
                  </nav>';
