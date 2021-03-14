@@ -1,5 +1,6 @@
 <?php 
     Header::set_header_carousel_cookie();
+    Nalog::set_login_cookie();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,8 +14,10 @@
     <link rel="icon" href="https://skolskabiblioteka.muharemovic.com/img/logo.png" sizes="16x16">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://skolskabiblioteka.muharemovic.com/styles/main.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
+    <noscript>Ваш интернет прегледач не подржава JavaScript-у. Због тога Вам овај сајт неће бити доступан.</noscript>
     <div class="header">
         <?php 
             Header::set_header_carousel();
