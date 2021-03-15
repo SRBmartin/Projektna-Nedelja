@@ -1,5 +1,5 @@
 <?php
-    session_start();
+    include_once "ss.inc.php";
     if(isset($_POST["submit"]) and $_POST["submit"] === 'login' and !isset($_SESSION["korisnik"])){
         include_once "../../classes/dbh.class.php";
         include_once "../../classes/nalog.class.php";
@@ -25,7 +25,7 @@
                             <a class="dropdown-item" href="#">Профил</a>
                             <a class="dropdown-item" href="#">Моје књиге</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="https://skolskabiblioteka.muharemovic.com/p/logout">Одјави се</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#logout-modal" id="logout-profile">Одјави се</a>
                             </div>
                         </li>';
                 }else{
