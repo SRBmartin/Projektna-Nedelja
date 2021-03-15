@@ -1,5 +1,5 @@
 <?php
-    session_start();
+    include_once "../inc/i/ss.inc.php";
     if(isset($_SESSION["korisnik"]["admin"]) and $_SESSION["korisnik"]["admin"] === "y"){
         include_once "../classes/dbh.class.php";
         include_once "../classes/header.class.php";

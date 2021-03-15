@@ -1,5 +1,5 @@
 <?php
-    session_start();
+    include_once "../inc/i/ss.inc.php";
     if(isset($_SESSION["korisnik"])){
         session_unset();
         session_destroy();
