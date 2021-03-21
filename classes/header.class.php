@@ -149,9 +149,13 @@
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="LoginRememberMeCheck" value="RememberMe">
                                         <label class="form-check-label" for="LoginRememberMeCheck">Запамти ме</label>
-                                    </div>
-                                    <div class="g-recaptcha" data-sitekey="6LfpjHgaAAAAAOMR8ghLBFYjRQYn9iNJIdNlavnP"></div>
-                                    <div class="invalid-feedback" id="capt-err" style="display:none;">Нисте означили заштитни слој reCaptcha.</div>
+                                    </div>';
+                                    if(isset($_SESSION["page_index_navbar_active"]) and $_SESSION["page_index_navbar_active"] === 6){
+                                        echo '<div id="g-rec-log"></div>';
+                                    } else{
+                                        echo '<div class="g-recaptcha" data-sitekey="6LfpjHgaAAAAAOMR8ghLBFYjRQYn9iNJIdNlavnP"></div>';
+                                    }
+                                    echo '<div class="invalid-feedback" id="capt-err" style="display:none;">Нисте означили заштитни слој reCaptcha.</div>
                                     <div class="invalid-feedback" id="login-err" style="display:none;">Дошло је до грешке. Покушајте касније.</div>
                                     <div class="invalid-feedback" id="ver-err" style="display:none;">Ваш налог није верификован Проверите свој мејл и потражите линк за верификацију, ако желите можете опет да пошаљете мејл притисните <a href="https://skolskabiblioteka.muharemovic.com/p/mailver">овде</a>.</div>
                                     <button type="button" id="login-submit" class="btn btn-primary">Пријави се</button>
