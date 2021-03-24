@@ -68,8 +68,21 @@ body{
     background-color: #DBDFE6;
     padding: 20px 20px;
     border: 1px solid black;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    border-radius: 12px;
 }
 
 #signup-submit{
     margin-top: 15px; 
+}
+
+.info-signup{
+    opacity: 0.7;
+    margin-left:5px;
+}
+
+.info-signup:hover{
+    opacity: 1.0;
+    cursor: pointer;
 }
