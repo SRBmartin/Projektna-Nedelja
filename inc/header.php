@@ -14,8 +14,10 @@
     <link rel="icon" href="https://skolskabiblioteka.muharemovic.com/img/logo.png" sizes="16x16">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://skolskabiblioteka.muharemovic.com/styles/main.css">
+    <script src="https://kit.fontawesome.com/49616ed0d1.js" crossorigin="anonymous"></script>
     <?php
-        if($_SESSION["page_index_navbar_active"] === 6){
+        include_once 'i/rmvTmp.inc.php';
+        if(isset($_SESSION["grcap"])){
             echo '<script src="../scripts/signup-capt.js"></script>
                  <script src="https://www.google.com/recaptcha/api.js?onload=g_recapFunc&render=explicit" async defer></script>';
         } else{
@@ -33,5 +35,4 @@
                 echo '<div id="m-target"></div>';
             }
         ?>
-        
     </div>
