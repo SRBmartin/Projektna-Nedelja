@@ -33,7 +33,7 @@
                 header('HTTP/1.0 400 Bad error'); //stmt greska
                 exit();
             } else{
-                $stmt->bind_param("s",$email);
+                $stmt->bind_param("s",rtrim($email," "));
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $stmt->close();
@@ -62,6 +62,22 @@
                 } else{
                     return -1;
                 }
+            }
+        }
+
+        public static function getUserEmail($con,$id){
+            $sql = "SELECT email FROM korisnici WHERE id=?;";
+            $stmt = $con->stmt_init();
+            if(!$stmt->prepare($sql)){
+                header('HTTP/1.0 400 Bad error'); //stmt greska
+                exit();
+            } else{
+                $stmt->bind_param("i",$id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $inf = $result->fetch_assoc();
+                $stmt->close();
+                return $inf["email"];
             }
         }
 
@@ -188,6 +204,11 @@
                         $check = true;
                         break;
                     }
+                    if($i == count($string)-1 and !$check){
+                        if($string[$i] == " "){
+                            $check = true;
+                        }
+                    }
                 }
                 if(!$check){
                     return false;
@@ -225,6 +246,11 @@
                     if($kIme[$i] == $cirilicaM[$j] or $kIme[$i] == $cirilicaV[$j]){
                         $check = true;
                         break;
+                    }
+                    if($i == count($kIme)-1 and !$check){
+                        if($kIme[$i] == " "){
+                            $check = true;
+                        }
                     }
                 }
                 if(!$check){
@@ -357,9 +383,9 @@
                 exit();
             } else{
                 $salt = md5(time().$email);
-                $ime = self::p_split_array2string($ime);
-                $prezime = self::p_split_array2string($prezime);
-                $kIme = self::p_split_array2string($kIme);
+                $ime = rtrim(self::p_split_array2string($ime)," ");
+                $prezime = rtrim(self::p_split_array2string($prezime)," ");
+                $kIme = rtrim(self::p_split_array2string($kIme)," ");
                 $sifra = password_hash($salt.$password.$salt,PASSWORD_DEFAULT);
                 $datum_reg = date("Y/m/d");
                 $ssid = md5(time().$ime.$prezime);
@@ -401,6 +427,257 @@
                     $mail->Body .= '<a href="https://skolskabiblioteka.muharemovic.com/p/mailver?vkey='.$vkey.'">Притисните овде за потврду</a>';
                     $mail->send();
                     return true;
+                }
+            }
+        }
+
+        public static function sendVerifyMail($con,$id,$email){
+            $sql = "SELECT vkey FROM ver WHERE id=?;";
+            $stmt = $con->stmt_init();
+            if(!$stmt->prepare($sql)){
+                header('HTTP/1.0 400 bad stmt error');
+                exit();
+            } else{
+                $stmt->bind_param("i",$id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $stmt->close();
+                $inf = $result->fetch_assoc();
+                $vkey = $inf["vkey"];
+                include_once '../../classes/phpMailer/vendor/autoload.php';
+                    $mail = new PHPMailer();
+                    $mail->CharSet = 'UTF-8';
+                    $mail->Encoding = 'base64';
+                    $mail->SMTPDebug = 0;
+                    $mail->isSMTP();
+                    $mail->Host = 'mail.muharemovic.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = '';
+                    $mail->Password = '';
+                    $mail->SMTPSecure = 'tls';
+                    $mail->Port = 587;
+
+                    $mail->setFrom('verify@muharemovic.com','Верификација');
+                    $mail->addAddress($email);
+
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Верификујте свој налог на skolskabiblioteka.muharemovic.com';
+                    $mail->Body  = 'Покренута је регистрација налога на skolskabiblioteka.muharemovic.com <br>';
+                    $mail->Body .= 'Ако ово нисте били Ви, игноришите овај мејл. Уколико јесте, притисните ово дугме';
+                    $mail->Body .= ' како бисте довршили регистрацију свог налога и потврдили своју мејл адресу. <br>';
+                    $mail->Body .= '<a href="https://skolskabiblioteka.muharemovic.com/p/mailver?vkey='.$vkey.'">Притисните овде за потврду</a>';
+                    $mail->send();
+                    return true;
+            }
+        }
+
+        public static function checkVkey($con,$vkey){
+            $sql = "SELECT id FROM ver WHERE vkey=?;";
+            $stmt = $con->stmt_init();
+            $id = -1;
+            if(!$stmt->prepare($sql)){
+                header('HTTP/1.0 400 bad stmt error');
+                exit();
+            } else{
+                $stmt->bind_param("s",$vkey);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $stmt->close();
+                $inf = $result->fetch_assoc();
+                if($inf){
+                    $id = (int)$inf["id"];
+                    $sql = "UPDATE korisnici SET verifikovan='y' WHERE id=?;";
+                    $stmt = $con->stmt_init();
+                    if(!$stmt->prepare($sql)){
+                        header('HTTP/1.0 400 bad stmt error');
+                        exit();
+                    } else{
+                            $stmt->bind_param("i",$id);
+                            $stmt->execute();
+                            $stmt->close();
+                            $sql = "DELETE FROM ver WHERE id=? AND vkey=?;";
+                            $stmt = $con->stmt_init();
+                            if(!$stmt->prepare($sql)){
+                                header('HTTP/1.0 400 bad stmt error');
+                                exit();
+                            } else{
+                                $stmt->bind_param("is",$id,$vkey);
+                                $stmt->execute();
+                                $stmt->close();
+                                return 1;
+                            }
+                        }
+                } else{
+                    return 0;
+                }
+            }
+        }
+
+        public static function setForgottenPass($con,$id,$email){
+            $sql = "SELECT datum_isteka FROM forgot_pass WHERE id=?;";
+            $stmt = $con->stmt_init();
+            if(!$stmt->prepare($sql)){
+                header('HTTP/1.0 400 bad stmt error');
+                exit();
+            } else{
+                $stmt->bind_param("i",$id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $inf = $result->fetch_assoc();
+                $stmt->close();
+                if($inf){
+                    $sql = "DELETE FROM forgot_pass WHERE id=?;";
+                    $stmt = $con->stmt_init();
+                    if(!$stmt->prepare($sql)){
+                        header('HTTP/1.0 400 bad stmt error');
+                        exit();
+                    } else{
+                        $stmt->bind_param("i",$id);
+                        $stmt->execute();
+                        $stmt->close();
+                    }
+                }
+                        $sql = "INSERT INTO forgot_pass VALUES(?,?,?,date_add(DATE_FORMAT(NOW(),\"%Y/%m/%d %H:%i:%s\"), INTERVAL 15 MINUTE));";
+                        $stmt = $con->stmt_init();
+                        if(!$stmt->prepare($sql)){
+                            header('HTTP/1.0 400 bad stmt error');
+                            exit();
+                        } else{
+                            $fkey = md5($email.time());
+                            $auth = md5(password_hash($email.time(),PASSWORD_DEFAULT).time());
+                            $stmt->bind_param("iss",$id,$fkey,$auth);
+                            $stmt->execute();
+                            $stmt->close();
+                            include_once '../../classes/phpMailer/vendor/autoload.php';
+                            $mail = new PHPMailer();
+                            $mail->CharSet = 'UTF-8';
+                            $mail->Encoding = 'base64';
+                            $mail->SMTPDebug = 0;
+                            $mail->isSMTP();
+                            $mail->Host = 'mail.muharemovic.com';
+                            $mail->SMTPAuth = true;
+                            $mail->Username = '';
+                            $mail->Password = '';
+                            $mail->SMTPSecure = 'tls';
+                            $mail->Port = 587;
+
+                            $mail->setFrom('verify@muharemovic.com','Школска библиотека');
+                            $mail->addAddress($email);
+
+                            $mail->isHTML(true);
+                            $mail->Subject = 'Захтев за промену шифре на skolskabiblioteka.muharemovic.com';
+                            $mail->Body  = 'Покренут је захтев за промену шифре на сајту skolskabiblioteka.muharemovic.com <br>';
+                            $mail->Body .= 'Ако ово нисте били Ви, игноришите овај мејл. Уколико јесте, притисните ово дугме';
+                            $mail->Body .= ' како бисте могли да промените своју шифру.<br>Овај код истиче за 15 минута.';
+                            $mail->Body .= '<a href="https://skolskabiblioteka.muharemovic.com/p/fpass?fkey='.$fkey.'&auth='.$auth.'">Притисните овде за промену шифре</a>';
+                            $mail->send();
+                            return true;
+                        }
+            }
+            
+        }
+
+        public static function checkFpass($con, $fkey, $auth){
+            $sql = "SELECT id,datum_isteka FROM forgot_pass WHERE fkey=? AND auth=?;";
+            $stmt = $con->stmt_init();
+            if(!$stmt->prepare($sql)){
+                header('HTTP/1.0 400 bad stmt error');
+                exit();
+            } else{
+                $stmt->bind_param("ss",$fkey,$auth);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $inf = $result->fetch_assoc();
+                $stmt->close();
+                if($inf){
+                    if($inf["datum_isteka"] < date("Y-m-d H:i:s")){
+                        $sql = "DELETE FROM forgot_pass WHERE fkey=? AND auth=?;";
+                        $stmt = $con->stmt_init();
+                        if(!$stmt->prepare($sql)){
+                           header('HTTP/1.0 400 bad stmt error');
+                            exit(); 
+                        } else{
+                            $stmt->bind_param("ss",$fkey,$auth);
+                            $stmt->execute();
+                            $stmt->close();
+                        }
+                        return -2;
+                    } else{
+                        return 1;
+                    }
+                } else{
+                    return -1;
+                }
+            }
+        }
+
+        public static function auth_verify_fpass($fkey,$auth){
+            if($_SESSION["fpass-verify"]["fkey"] == $fkey and $_SESSION["fpass-verify"]["auth"] == $auth){
+                return true;
+            } else{
+                return false;
+            }
+        }
+
+        public static function change_passFpass($con,$newPass,$fk,$au){
+            $sql = "SELECT id FROM forgot_pass WHERE fkey=? AND auth=?;";
+            $stmt = $con->stmt_init();
+            $id = -1;
+            if(!$stmt->prepare($sql)){
+                header('HTTP/1.0 400 bad stmt err');
+                exit();
+            } else{
+                $stmt->bind_param("ss",$fk,$au);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $inf = $result->fetch_assoc();
+                $stmt->close();
+                $id = (int)$inf["id"];
+                $sql = "UPDATE korisnici SET salt=?,sifra=? WHERE id=?;";
+                $stmt = $con->stmt_init();
+                if(!$stmt->prepare($sql)){
+                    header('HTTP/1.0 400 bad stmt err');
+                    exit();
+                } else{
+                    $salt = md5(time().$fk);
+                    $sifra = password_hash($salt.$newPass.$salt,PASSWORD_DEFAULT);
+                    $stmt->bind_param("ssi",$salt,$sifra,$id);
+                    $stmt->execute();
+                    $stmt->close();
+                    $sql = "DELETE FROM forgot_pass WHERE id=?;";
+                    $stmt = $con->stmt_init();
+                    if(!$stmt->prepare($sql)){
+                        header('HTTP/1.0 400 bad stmt err');
+                        exit();
+                    } else{
+                        $stmt->bind_param("i",$id);
+                        $stmt->execute();
+                        $stmt->close();
+                        $email = self::getUserEmail($con,$id);
+                        include_once '../../classes/phpMailer/vendor/autoload.php';
+                            $mail = new PHPMailer();
+                            $mail->CharSet = 'UTF-8';
+                            $mail->Encoding = 'base64';
+                            $mail->SMTPDebug = 0;
+                            $mail->isSMTP();
+                            $mail->Host = 'mail.muharemovic.com';
+                            $mail->SMTPAuth = true;
+                            $mail->Username = '';
+                            $mail->Password = '';
+                            $mail->SMTPSecure = 'tls';
+                            $mail->Port = 587;
+
+                            $mail->setFrom('verify@muharemovic.com','Школска библиотека');
+                            $mail->addAddress($email);
+
+                            $mail->isHTML(true);
+                            $mail->Subject = 'Промењена шифра на skolskabiblioteka.muharemovic.com';
+                            $mail->Body  = 'Обавештавамо Вас да је на сајту skolskabiblioteka.muharemovic.com успешно промењена шифра.<br>';
+                            $mail->Body .= 'Ако ово нисте били Ви, одмах пријавите проблем нашој подршци.<br>';
+                            $mail->Body .= 'Шифра је промењена са следеће IP адресе: <strong>'.$_SERVER["REMOTE_ADDR"].'</strong>';
+                            $mail->send();
+                            return true;
+                    }
                 }
             }
         }
