@@ -1,6 +1,7 @@
 <?php
     include_once "../inc/i/ss.inc.php";
     if(!isset($_SESSION["korisnik"])){
+        $_SESSION["grcap"] = 'a';
         include_once "../classes/dbh.class.php";
         include_once "../classes/header.class.php";
         include_once "../classes/nalog.class.php";
@@ -9,8 +10,7 @@
         include_once "../inc/header.php";
         echo '<div class="sUContainer mx-auto">';
         echo Main::set_signup();
-        echo '</div>
-             </body>';
+        echo '</div>';
         include_once "../inc/footer.php";
     } else{
         header("Location: https://skolskabiblioteka.muharemovic.com");

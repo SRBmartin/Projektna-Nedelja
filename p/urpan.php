@@ -6,6 +6,5 @@
         include_once "../classes/nalog.class.php";
         $_SESSION["page_index_navbar_active"] = 5; //određuje na kojoj je stranici da bi se link u navigaciji promenio
         include_once "../inc/header.php";
-        echo '</body>';
         include_once "../inc/footer.php";
     }
