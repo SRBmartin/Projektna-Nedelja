@@ -51,6 +51,9 @@ $(document).ready(function(){
                 },
                 success: function(response){
                     $("ul#profil-login-ul").html(response);
+                    if(typeof rmvTltp == 'function'){
+                        rmvTltp();
+                    }
                     $.ajax(
                         {
                             url: 'https://skolskabiblioteka.muharemovic.com/inc/i/a/m-l.inc.php',
