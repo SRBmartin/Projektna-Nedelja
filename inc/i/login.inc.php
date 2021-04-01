@@ -1,5 +1,6 @@
 <?php
     include_once "ss.inc.php";
+    include_once 'rmvTmp.inc.php';
     if(isset($_POST["submit"]) and $_POST["submit"] === 'login' and !isset($_SESSION["korisnik"])){
         include_once "../../classes/dbh.class.php";
         include_once "../../classes/nalog.class.php";

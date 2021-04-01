@@ -1,5 +1,6 @@
 <?php
     include_once "ss.inc.php";
+    include_once 'rmvTmp.inc.php';
     if(isset($_POST["submit"]) and $_POST["submit"] === 'signup' and !isset($_SESSION["korisnik"])){
         include_once "../../classes/dbh.class.php";
         include_once "../../classes/nalog.class.php";
@@ -15,6 +16,7 @@
             $email = $_POST["email"];
             $password = $_POST["password"];
             $rptPassword = $_POST["passwordRpt"];
+            $email = rtrim($email," ");
             if(count($ime) < 3 or count($ime) > 63){
                 header('HTTP/1.0 711 long name');
                 exit();
@@ -46,9 +48,9 @@
                                 if(!Nalog::invalidPassword($password)){
                                     if(Nalog::passwordsMatch($password,$rptPassword)){
                                         if(!Nalog::userExists($con,$email)){
-                                            if(!Nalog::usernameExists($con,Nalog::p_split_array2string($kIme))){
+                                            if(!Nalog::usernameExists($con,rtrim(Nalog::p_split_array2string($kIme)," "))){
                                                 Nalog::createUser($con,$ime,$prezime,$kIme,$email,$password);
-                                                echo '<div class="signupForm mx-auto" style="font-size:26px;font-weight:bold;"><center>Ваш налог је регистрован. Да бисте довршили регистрацију морате да 
+                                                echo '<div class="signupForm mx-auto" style="font-size:26px;font-weight:bold;overflow:scrollable;"><center>Ваш налог је регистрован. Да бисте довршили регистрацију морате да 
                                                      потврдите свој налог притиском на линк послат на <em>'.$email.'</em>.<br>
                                                      Након тога можете да се пријавите на свој налог.</center><div>';
                                             } else{
