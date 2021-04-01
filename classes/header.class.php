@@ -68,8 +68,8 @@
             $title = self::get_title();
             echo '<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
                  <a class="navbar-brand navbar-L-text" href="https://skolskabiblioteka.muharemovic.com">
-                    <img src="https://skolskabiblioteka.muharemovic.com/img/logo.png" class="navbar-brand-img img-fluid " />
-                    Школска библиотека
+                    <img src="https://skolskabiblioteka.muharemovic.com/img/logo.png" id="logo-navbar" class="navbar-brand-img img-fluid " />
+                    '.$title.'
                  </a>
                  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#Header-Navbar-Dropdown-Knjizevnost" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                  <span class="navbar-toggler-icon"></span>
@@ -110,7 +110,14 @@
                                 echo '<a class="dropdown-item" href="https://skolskabiblioteka.muharemovic.com/p/k/drama">Драма</a>';
                              }
                         echo '</div></li>';
-                          if(isset($_SESSION["page_index_navbar_active"])  and $_SESSION["page_index_navbar_active"] === 4){
+                        if(isset($_SESSION["page_index_navbar_active"]) and $_SESSION["page_index_navbar_active"] === 9){
+                            echo '<li class="nav-item active">'; 
+                        } else{
+                            echo '<li class="nav-item">'; 
+                        }
+                        echo '<a class="nav-link" href="https://skolskabiblioteka.muharemovic.com/p/citati">Цитати</a>
+                             </li>';
+                        if(isset($_SESSION["page_index_navbar_active"])  and $_SESSION["page_index_navbar_active"] === 4){
                             echo '<li class="nav-item active">'; 
                             unset($_SESSION["page_index_navbar_active"]);
                         } else{
@@ -136,22 +143,23 @@
                                 echo '<li class="nav-item dropdown" id="Login-Li">';
                             }
                             echo '<a class="nav-link dropdown-toggle" id="NavBarDropDownKorisnik" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Пријави се</a>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="NavBarDropDownKorisnik">
+                                <div class="dropdown-menu dropdown-menu-right" id="login-dropdown" aria-labelledby="NavBarDropDownKorisnik">
                                 <form class="px-4 py-3" id="login-form">
                                     <div class="form-group">
                                         <label for="LoginEmailNavBar">Мејл адреса</label>
-                                        <input type="email" class="form-control" id="LoginEmailNavBar" placeholder="email@example.com">
+                                        <input type="email" autocomplete="username" class="form-control" id="LoginEmailNavBar" placeholder="email@example.com">
                                     </div>
                                     <div class="form-group">
                                         <label for="LoginPasswordNavBar">Шифра</label>
-                                        <input type="password" class="form-control" id="LoginPasswordNavBar" placeholder="********">
+                                        <input type="password" autocomplete="current-password" class="form-control" id="LoginPasswordNavBar" placeholder="********">
                                     </div>
                                     <div class="form-check">
                                         <input type="checkbox" class="form-check-input" id="LoginRememberMeCheck" value="RememberMe">
                                         <label class="form-check-label" for="LoginRememberMeCheck">Запамти ме</label>
                                     </div>';
-                                    if(isset($_SESSION["page_index_navbar_active"]) and $_SESSION["page_index_navbar_active"] === 6){
+                                    if((isset($_SESSION["grcap"]))){
                                         echo '<div id="g-rec-log"></div>';
+                                        unset($_SESSION["grcap"]);
                                     } else{
                                         echo '<div class="g-recaptcha" data-sitekey="6LfpjHgaAAAAAOMR8ghLBFYjRQYn9iNJIdNlavnP"></div>';
                                     }
